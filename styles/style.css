@@ -1,51 +1,408 @@
+/* =========================
+   Style for "Посмотри в окно"
+   Полная замена style.css
+   ========================= */
+
+/* 1) Базовый reset и переменные */
+:root{
+  --bg: #1b1919;
+  --text: #ffffff;
+  --muted: #545050;
+  --accent: #d9d9d9;
+  --page-width: 1200px;
+  --content-gap: 30px;
+  --left-col: 711px;
+  --right-col: 399px;
+  --base-size: 18px;
+  --title-size: 75px;
+  --card-thumb-w: 194px;
+  --card-thumb-h: 103px;
+  --focus-color: rgba(255,255,255,0.9);
+  --radius: 6px;
+}
+
+/* Reset */
 *,
 *::before,
-*::after {
-  box-sizing: border-box;
+*::after{box-sizing: border-box;margin:0;padding:0}
+
+html,body{
+  height:100%;
+  font-size: var(--base-size);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background: var(--bg);
+  color: var(--text);
 }
 
-html {
-  block-size: 100%;
+.page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 40px 16px;
+  font-family: "Fira Sans Condensed", sans-serif;
 }
 
-.page {
-  inline-size: 1200px;
-  block-size: 100%;
-  margin: auto;
-  color: #fff;
-  font-family: 'Fira Sans Condensed', sans-serif;
+/* Semantic headings, lists */
+h1,h2,h3,h4,p,ul,ol,li,blockquote,fieldset{margin:0;padding:0}
+ul,ol{list-style:none}
+
+/* 2) Page grid / основной контейнер */
+.content{
+  width: min(var(--page-width), 100%);
+  display: grid;
+  grid-template-columns: var(--left-col) var(--right-col);
+  gap: var(--content-gap);
+  align-items: start;
+  margin: 0 auto;
+}
+
+/* 3) Левая колонка - результат (видео + форма) */
+.result{
+  display:flex;
+  flex-direction:column;
+  gap: 18px;
+  align-self: start;
+}
+
+/* Видео-контейнер: оставляем cover, делаем аккуратную рамку и radius */
+.result__video-container{
+  position: relative;
+  width: 100%;
+  height: 386px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.15));
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6) inset;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.result__video-container:focus-within,
+.result__video-container:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+}
+
+.result__video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+  border-radius: inherit;
+}
+
+/* 4) Форма поиска: компактный, аккуратный grid */
+.search-form{
+  display: grid;
+  grid-template-columns: 225px 1fr 194px;
+  gap: 24px;
+  align-items: end;
+  height: 54px;
+}
+
+/* fieldset внутри формы — минимальная стилизация */
+.search-form__fieldset{
+  border: none;
+  display:flex;
+  flex-direction:column;
+}
+
+/* подписи */
+.search-form__fieldset-title{
+  font-family: "Fira Sans Condensed", sans-serif;
+  font-weight: 400;
   font-size: 18px;
-  background-color: #1b1919;
+  line-height: 22px;
+  margin-bottom: 6px;
+  color: var(--text);
 }
 
-h1,
-h2,
-h3,
-h4,
-p,
-ul,
-ol,
-li,
-blockquote,
-fieldset {
-  margin: 0;
-  padding: 0;
+/* текстовое поле */
+.search-form__textfield{
+  width:100%;
+  border: none;
+  background: transparent;
+  border-top: 1px solid rgba(255,255,255,0.95);
+  border-bottom: 1px solid rgba(255,255,255,0.95);
+  padding: 4px 2px;
+  color: var(--text);
+  font: inherit;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-ul,
-ol {
-  list-style: none;
+.search-form__textfield::placeholder{
+  color: rgba(255,255,255,0.65);
 }
 
-/* Кастомный скроллбар */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+/* чекбоксы — кастомные: скрываем реальный input и рисуем square */
+.search-form__checkbox{
+  position:absolute;
+  width:1px;height:1px;
+  opacity:0;
+  pointer-events:none;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgb(217 217 217 / 10%);
+.search-form__label{
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #D9D9D9;
+/* визуальная квадратная "псевдо"-чекбокс */
+.search-form__pseudo-checkbox{
+  display:inline-grid;
+  place-items:center;
+  width:19px;
+  height:19px;
+  border:1px solid rgba(255,255,255,0.95);
+  border-radius: 2px;
+  flex: 0 0 19px;
+  position:relative;
+}
+
+/* галочка — псевдоэлемент (плавная трансформация) */
+.search-form__checkbox:checked + .search-form__pseudo-checkbox::after{
+  content: "";
+  width: 12px;
+  height: 8px;
+  transform: rotate(-45deg);
+  border-left: 2px solid #000;
+  border-bottom: 2px solid #000;
+  background: white;
+  box-sizing:border-box;
+  display:block;
+  margin-left: 0.5px;
+  margin-bottom: 1px;
+}
+
+/* при hover по label — подчёркиваем текст */
+.search-form__label:hover .search-form__label-text{
+  text-decoration: underline;
+}
+
+/* когда внутри label есть фокус (с клавиатуры) — видимая рамка */
+.search-form__label:has(.search-form__checkbox:focus-visible) .search-form__pseudo-checkbox{
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+/* Кнопка отправки */
+.button{
+  width: 194px;
+  height: 34px;
+  border: 1px solid rgba(255,255,255,0.95);
+  background: transparent;
+  font-family: "Fira Sans Condensed", sans-serif;
+  font-weight:700;
+  font-size: 18px;
+  line-height:22px;
+  color: var(--text);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition: background .12s ease, transform .08s ease;
+}
+
+.button:hover{
+  text-decoration: underline;
+}
+
+.button:active{
+  background: rgba(84,80,80,0.35);
+  transform: translateY(1px);
+}
+
+.button:focus-visible{
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+/* 5) Правая колонка — детали и список карточек */
+.content__details{
+  display:flex;
+  flex-direction:column;
+  gap:26px;
+  align-self: start;
+  height:100%;
+  font-family: "Oswald", sans-serif;
+}
+
+/* Заголовок / логотип */
+.title{
+  font-family: "Oswald", sans-serif;
+  font-weight:700;
+  font-size: var(--title-size);
+  line-height: 0.94;
+  text-transform: uppercase;
+  color: var(--text);
+  letter-spacing: -1px;
+  display:block;
+}
+
+/* акцентная часть заголовка (чтобы можно было стилизовать слово "По-") */
+.content__accent{
+  color: var(--muted);
+  font-family: "Oswald", sans-serif;
+  font-weight:700;
+}
+
+/* Список карточек: прокрутка, аккуратные отступы */
+.content__list-container{
+  height: 298px;
+  overflow-y: auto;
+  padding-right: 8px; /* место под скролл */
+}
+
+/* Стилизация скроллбара (WebKit) */
+.content__list-container::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar{
+  width: 6px;
+}
+.content__list-container::-webkit-scrollbar-track{
+  background: rgba(217,217,217,0.06);
+  border-radius: 4px;
+}
+.content__list-container::-webkit-scrollbar-thumb{
+  background: rgba(217,217,217,0.8);
+  border-radius: 4px;
+}
+
+/* Сама ul-списка — вертикальная колонка */
+.content__list{
+  display:flex;
+  flex-direction:column;
+  gap: 30px;
+  padding: 6px 0;
+}
+
+/* Одна карточка */
+.content__list-item{
+  padding: 6px 3px;
+  border-radius: 4px;
+  transition: background .12s ease, transform .12s ease;
+}
+
+/* ссылка вокруг карточки — поведение */
+.content__card-link{
+  color: inherit;
+  text-decoration: none;
+  display:block;
+  width:100%;
+}
+
+/* карточка: описание + миниатюра */
+.content__video-card{
+  display:flex;
+  gap: 12px;
+  align-items:flex-start;
+  justify-content:space-between;
+}
+
+/* миниатюра */
+.content__video-card-thumbnail{
+  width: var(--card-thumb-w);
+  height: var(--card-thumb-h);
+  object-fit: cover;
+  object-position:center;
+  flex: 0 0 var(--card-thumb-w);
+  border-radius: 4px;
+}
+
+/* описание — даём возможность сокращать текст */
+.content__video-card-description-container{
+  min-width: 0; /* важное свойство для text-overflow */
+  max-width: calc(100% - var(--card-thumb-w) - 12px);
+}
+
+/* заголовок в карточке */
+.content__video-card-title{
+  font-family: "Oswald", sans-serif;
+  font-weight:700;
+  font-size: 30px;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom:6px;
+}
+
+/* описание: ограничение строк (кросс-браузерный вариант) */
+.content__video-card-description{
+  font-family: "Fira Sans Condensed", sans-serif;
+  font-size: 16px;
+  line-height: 1.1;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,0.95);
+}
+
+/* Hover и фокус карточки */
+.content__list-item:hover,
+.content__list-item:active{
+  background: rgba(84,80,80,0.15);
+  transform: translateY(-2px);
+}
+
+.content__list-item:focus-within,
+.content__video-card:focus-visible{
+  outline: 1px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+/* "Показать ещё" кнопка */
+.more-button{
+  width:100%;
+  margin-left:3px;
+  margin-top: 8px;
+}
+
+/* Ошибки, прелоадер и пр. (только базовые стили, т.к. есть отдельные файлы) */
+.error{
+  padding: 18px;
+  background: rgba(255,0,0,0.06);
+  border: 1px solid rgba(255,0,0,0.12);
+  border-radius: 6px;
+}
+
+/* Визуально скрытый контейнер (для доступности) */
+.visually-hidden{
+  position: absolute !important;
+  width:1px;height:1px;
+  padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+
+/* 6) Небольшая адаптивность: на узких экранах сворачиваем сетку в колонку.
+   (Мы не меняем DOM, только делаем аккуратный fallback) */
+@media (max-width: 1180px){
+  :root{ --page-width: 1000px }
+  .content{
+    grid-template-columns: 1fr;
+    width: min(980px, 100%);
+  }
+  .result__video-container{ height: 320px }
+  .search-form{ grid-template-columns: 1fr 194px; gap: 16px }
+  .title{ font-size: 56px }
+}
+
+@media (max-width: 520px){
+  .page{ padding: 24px 12px }
+  .result__video-container{ height: 220px }
+  .title{ font-size: 40px; line-height: 1 }
+  .search-form{ grid-template-columns: 1fr; align-items: start; gap: 12px; height: auto }
+  .button{ width: 100% }
+  .content__video-card-thumbnail{ width: 140px; height: 80px; flex: 0 0 140px }
 }
